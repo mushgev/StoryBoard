@@ -10,7 +10,7 @@ using System.Web.Security;
 
 namespace StoryBoard.Controllers
 {
-    public class SecurityController : Controller
+    public class SecurityController : BaseController
     {
         private readonly UserLogic _userLogic;
 
@@ -27,6 +27,12 @@ namespace StoryBoard.Controllers
         public ActionResult Login()
         {
             return View();
+        }
+
+        public ActionResult LogOut()
+        {
+            FormsAuthentication.SignOut();
+            return RedirectToAction("Login");
         }
 
         [HttpPost]

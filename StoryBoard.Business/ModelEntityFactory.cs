@@ -64,6 +64,7 @@ namespace StoryBoard.Business
             return new GroupModel
             {
                 GroupId = entity.GroupId,
+                OwnerId = entity.OwnerId,
                 Name = entity.Name,
                 Description = entity.Description
             };
@@ -79,6 +80,7 @@ namespace StoryBoard.Business
             return new Group
             {
                 GroupId = model.GroupId,
+                OwnerId = model.OwnerId,
                 Name = model.Name,
                 Description = model.Description
             };
@@ -94,6 +96,7 @@ namespace StoryBoard.Business
             return new StoryModel
             {
                 StoryId = entity.StoryId,
+                UserId = entity.UserId,
                 Title = entity.Title,
                 Description = entity.Description,
                 Content = entity.Content,
@@ -111,6 +114,7 @@ namespace StoryBoard.Business
             return new Story
             {
                 StoryId = model.StoryId,
+                UserId = model.UserId,
                 Title = model.Title,
                 Description = model.Description,
                 Content = model.Content,
