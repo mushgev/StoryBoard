@@ -74,6 +74,7 @@ namespace StoryBoard.Controllers
             }
             catch (ArgumentException ex)
             {
+                ViewBag.GroupOptions = new MultiSelectList(_groupLogic.GetUserGroups(Identity.UserId), "GroupId", "Name", model.Groups);
                 ModelState.AddModelError(ex.ParamName, ex.Message);
                 return View(model);
             }

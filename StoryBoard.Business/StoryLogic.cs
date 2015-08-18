@@ -48,6 +48,10 @@ namespace StoryBoard.Business
             _context.Stories.Attach(story);
             _context.Entry(story).Collection(s => s.Groups).Load();
 
+            if(model.Groups == null)
+            {
+                model.Groups = new List<int>();
+            }
             var groupsToAdd = model.Groups.Where(id => !story.Groups.Any(g => g.GroupId == id)).ToList();
             var groupsToRemove = story.Groups.Where(group => !model.Groups.Any(id => group.GroupId == id)).ToList();
 
