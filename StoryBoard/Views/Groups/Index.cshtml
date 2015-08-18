@@ -44,11 +44,16 @@
             <td>
                 @if (item.OwnerId == (User.Identity as StoryBoard.Security.StoryBoardIdentity).UserId)
                 {
-                    <div>
+                    <text>
                         @Html.ActionLink("Edit", "Edit", new { id = item.GroupId }) |
-                        @Html.ActionLink("Details", "Details", new { id = item.GroupId }) |
-                        @Html.ActionLink("Delete", "DeleteConfirm", new { id = item.GroupId })
-                    </div>
+                        @Html.ActionLink("Details", "Details", new { id = item.GroupId })
+                        @if (item.StoriesCount == 0 && item.SubscribersCount == 0)
+                        {
+                            <text>
+                                | @Html.ActionLink("Delete", "DeleteConfirm", new { id = item.GroupId })
+                            </text>
+                        }
+                    </text>
                 }
             </td>
         </tr>
