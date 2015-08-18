@@ -12,5 +12,9 @@ namespace StoryBoard.Model
         public int OwnerId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+
+        public bool IsSubscribed { get; set; }
+        public int SubscribersCount { get; set; }
+        public int StoriesCount { get; set; }
     }
 }

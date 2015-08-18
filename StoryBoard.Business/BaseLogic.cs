@@ -1,4 +1,5 @@
-﻿using StoryBoard.Model;
+﻿using StoryBoard.Data;
+using StoryBoard.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,13 @@ namespace StoryBoard.Business
         protected const int ListPagesCount = 10;
 
         protected readonly ModelEntityFactory _factory;
+        //Will be Garbage Collected
+        protected readonly StoryBoardContext _context;
 
-        public BaseLogic(ModelEntityFactory factory)
+        public BaseLogic(ModelEntityFactory factory, StoryBoardContext context)
         {
             _factory = factory;
+            _context = context;
         }
 
         protected PagedModel<T> ToPagedModel<T>(int total, int page, List<T> items) where T : class

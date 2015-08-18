@@ -18,5 +18,7 @@ namespace StoryBoard.Model
         [Required]
         public string Content { get; set; }
         public DateTime PostedOn { get; set; }
+
+        public List<int> Groups { get; set; }
     }
 }

@@ -13,10 +13,12 @@ namespace StoryBoard.Controllers
     public class StoriesController : BaseController
     {
         private readonly StoryLogic _storyLogic;
+        private readonly GroupLogic _groupLogic;
 
-        public StoriesController(StoryLogic storyLogic)
+        public StoriesController(StoryLogic storyLogic, GroupLogic groupLogic)
         {
             _storyLogic = storyLogic;
+            _groupLogic = groupLogic;
         }
 
         public ActionResult Index(int? page)
@@ -28,13 +30,20 @@ namespace StoryBoard.Controllers
 
         public ActionResult Create()
         {
+            var userId = Identity.UserId;
+            ViewBag.GroupOptions = new MultiSelectList(_groupLogic.GetUserGroups(userId), "GroupId", "Name");
+
             var story = new StoryModel();
             return View("Edit", story);
         }
 
         public ActionResult Edit(int id)
         {
+            var userId = Identity.UserId;
             var story = _storyLogic.Get(id);
+
+            ViewBag.GroupOptions = new MultiSelectList(_groupLogic.GetUserGroups(userId), "GroupId", "Name", story.Groups);
+
             return View(story);
         }
 

@@ -11,61 +11,68 @@ namespace StoryBoard.Business
 {
     public class StoryLogic : BaseLogic
     {
-        public StoryLogic(ModelEntityFactory factory)
-            : base(factory)
+        public StoryLogic(ModelEntityFactory factory, StoryBoardContext context)
+            : base(factory, context)
         {
 
         }
 
         public StoryModel Get(int id)
         {
-            using (var db = new StoryBoardContext())
-            {
-                var story = db.Stories.FirstOrDefault(s => s.StoryId == id);
-                return _factory.GetModel(story);
-            }
+            var story = _context.Stories.FirstOrDefault(s => s.StoryId == id);
+            return _factory.GetModel(story);
         }
 
         public PagedModel<StoryModel> GetUserStories(int userId, int? page)
         {
             page = page ?? 1;
 
-            using (var db = new StoryBoardContext())
-            {
-                var total = db.Stories.Count(s => s.UserId == userId);
+            var total = _context.Stories.Count(s => s.UserId == userId);
 
-                var stories = db.Stories.Where(s => s.UserId == userId)
-                            .OrderByDescending(s => s.StoryId)
-                            .Skip((page.Value - 1) * ListPageSize).Take(ListPageSize)
-                            .Select(_factory.GetModel).ToList();
+            var stories = _context.Stories.Where(s => s.UserId == userId)
+                        .OrderByDescending(s => s.StoryId)
+                        .Skip((page.Value - 1) * ListPageSize).Take(ListPageSize)
+                        .Select(_factory.GetModel).ToList();
 
-                return ToPagedModel(total, page.Value, stories);
-            }
+            return ToPagedModel(total, page.Value, stories);
         }
 
         public async Task Edit(StoryModel model)
         {
-            if(model.StoryId == 0)
+            if (model.StoryId == 0)
             {
                 model.PostedOn = DateTime.Now;
             }
 
-            using (var db = new StoryBoardContext())
+            var story = _factory.GetEntity(model);
+            _context.Stories.Attach(story);
+            _context.Entry(story).Collection(s => s.Groups).Load();
+
+            var groupsToAdd = model.Groups.Where(id => !story.Groups.Any(g => g.GroupId == id)).ToList();
+            var groupsToRemove = story.Groups.Where(group => !model.Groups.Any(id => group.GroupId == id)).ToList();
+
+            foreach (var item in groupsToRemove)
             {
-                var story = _factory.GetEntity(model);
-                db.Stories.AddOrUpdate(story);
-                await db.SaveChangesAsync();
+                story.Groups.Remove(item);
             }
+            
+            foreach (var groupId in groupsToAdd)
+            {
+                var group = new Group { GroupId = groupId };
+                _context.Groups.Attach(group);
+
+                story.Groups.Add(group);
+            }
+
+            _context.Stories.AddOrUpdate(story);
+            await _context.SaveChangesAsync();
         }
 
         public async Task Delete(int id)
         {
-            using (var db = new StoryBoardContext())
-            {
-                var story = db.Stories.FirstOrDefault(s => s.StoryId == id);
-                db.Stories.Remove(story);
-                await db.SaveChangesAsync();
-            }
+            var story = _context.Stories.FirstOrDefault(s => s.StoryId == id);
+            _context.Stories.Remove(story);
+            await _context.SaveChangesAsync();
         }
     }
 }

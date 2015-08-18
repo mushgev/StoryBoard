@@ -100,7 +100,8 @@ namespace StoryBoard.Business
                 Title = entity.Title,
                 Description = entity.Description,
                 Content = entity.Content,
-                PostedOn = entity.PostedOn
+                PostedOn = entity.PostedOn,
+                Groups = entity.Groups.Select(g => g.GroupId).ToList()
             };
         }
 

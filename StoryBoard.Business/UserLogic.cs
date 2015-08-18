@@ -12,51 +12,42 @@ namespace StoryBoard.Business
 {
     public class UserLogic : BaseLogic
     {
-        public UserLogic(ModelEntityFactory factory)
-            : base(factory)
+        public UserLogic(ModelEntityFactory factory, StoryBoardContext context)
+            : base(factory, context)
         {
 
         }
 
         public async Task Register(UserRegisterModel model)
         {
-            using (var db = new StoryBoardContext())
+            if (_context.Users.Any(u => u.Name.ToLower() == model.Name.ToLower()))
             {
-                if(db.Users.Any(u => u.Name.ToLower() == model.Name.ToLower()))
-                {
-                    throw new ArgumentException(Resources.UserNameExists, "Name");
-                }
-
-                var user = _factory.GetEntity(model);
-                db.Users.Add(user);
-                await db.SaveChangesAsync();
+                throw new ArgumentException(Resources.UserNameExists, "Name");
             }
+
+            var user = _factory.GetEntity(model);
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
         }
 
         public void Login(UserLoginModel model)
         {
-            using (var db = new StoryBoardContext())
+            var user = _context.Users.FirstOrDefault(u => u.Name == model.Name);
+            if (user == null)
             {
-                var user = db.Users.FirstOrDefault(u => u.Name == model.Name);
-                if(user == null)
-                {
-                    throw new ArgumentException(Resources.IncorrectNameOrPassword, "");
-                }
+                throw new ArgumentException(Resources.IncorrectNameOrPassword, "");
+            }
 
-                if(Security.HashSHA1(model.Password) != user.Password)
-                {
-                    throw new ArgumentException(Resources.IncorrectNameOrPassword, "");
-                }
+            if (Security.HashSHA1(model.Password) != user.Password)
+            {
+                throw new ArgumentException(Resources.IncorrectNameOrPassword, "");
             }
         }
 
         public UserModel Get(string name)
         {
-            using(var db = new StoryBoardContext())
-            {
-                var user = db.Users.FirstOrDefault(u => u.Name == name);
-                return _factory.GetModel(user);
-            }
+            var user = _context.Users.FirstOrDefault(u => u.Name == name);
+            return _factory.GetModel(user);
         }
     }
 }
